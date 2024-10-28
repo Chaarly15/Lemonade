@@ -5,10 +5,14 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -24,9 +28,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.lemonade.ui.theme.LemonadeTheme
+import kotlin.random.Random
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,6 +60,12 @@ fun LemonadePreviewApp(){
 fun LemonadeApp(modifier: Modifier = Modifier){
 
     var result by remember { mutableIntStateOf(1) }
+    var squeezeCount by remember { mutableIntStateOf(0) }
+
+    if (result == 2 && squeezeCount == 0) {
+        squeezeCount = Random.nextInt(2, 5)
+    }
+
     val imageResources = when (result){
         1->R.drawable.lemon_tree
         2->R.drawable.lemon_squeeze
@@ -67,12 +80,40 @@ fun LemonadeApp(modifier: Modifier = Modifier){
         else -> stringResource(R.string.empty_glass)
     }
 
+
+    Column(modifier = Modifier
+        .background(colorResource(R.color.title))
+        .fillMaxWidth()
+        .size(110.dp)
+        .wrapContentSize(Alignment.BottomCenter)) {
+       Text(
+           text = stringResource(R.string.app_name),
+           fontSize = 30.sp,
+           fontWeight = FontWeight.Bold,
+           modifier = Modifier
+               .padding(10.dp)
+       )
+    }
+
     Column(modifier = modifier
         .fillMaxSize()
         .wrapContentSize(Alignment.Center),
         horizontalAlignment = Alignment.CenterHorizontally){
 
-        Button(onClick = {result = if (result < 4) result + 1 else 1}, colors = ButtonDefaults.buttonColors(
+        Button(onClick = { if (result == 2) {
+
+            if (squeezeCount > 0) {
+                squeezeCount--
+            }
+            if (squeezeCount == 0) {
+                result = 3
+            }
+        } else {
+
+            result = if (result < 4) result + 1 else 1
+
+        }},
+            colors = ButtonDefaults.buttonColors(
             colorResource(id = R.color.limonade_bg)),
             shape = RoundedCornerShape(26.dp),
             modifier = Modifier) {
@@ -81,6 +122,7 @@ fun LemonadeApp(modifier: Modifier = Modifier){
         }
 
         Spacer(modifier = Modifier.height(20.dp))
-        Text(description)
+        Text(text = description,
+            fontSize = 20.sp)
     }
 }
